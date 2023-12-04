@@ -1,0 +1,79 @@
+---
+title: "Assignment B4"
+author: "Hannah Bobst"
+date: "December 7, 2023"
+output: 
+  html_document:
+    theme: cerulean
+    toc: true
+    toc_depth: 3
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r message=FALSE}
+# Load packages
+library(tidyverse)
+library(janeaustenr)
+library(stopwords)
+```
+
+
+# Exercise 1
+This exercise creates a bar graph of the 20 most common words in the *emma* data set from the *janeaustenr* package. 
+
+### Preparing the data
+The data must be prepared before it may be plotted. 
+First, each word is made into a single element of the data set. 
+The list format is removed so that the data set is a single vector, and all words are converted to be completely lower case. 
+The blank observations and punctuation are then removed.
+Afterward, all the stop words from the *stopwords* package are removed, and this subset of data is converted to a data frame (for plotting). 
+A summary table is then created which summarizes the amount of times each word appears.
+This table is sorted from most the common to least common words. 
+Finally, the table is truncated so that only the 20 most common words are included.
+
+```{r message=FALSE}
+# Create lowercase subset of "emma" data set without stop punctuation and blank entries
+emma_subset <- emma %>%
+  str_split(pattern=" ") %>%
+  unlist() %>%
+  tolower() %>%
+  str_subset(pattern="") %>%
+  str_remove_all(pattern="[.:;,?()_!&]") %>%
+  str_remove_all(pattern="\"") %>%
+  str_remove_all(pattern="--")
+
+# Subset "emma" further without stopwords (from "stopwords" package)
+emma_subset <- emma_subset[(emma_subset %in% stopwords()) == FALSE] 
+
+# Make "emma_subset" into a data frame
+emma_subset_df <- data.frame("words" = emma_subset)
+
+# Summarize counts of words and order largest to smallest
+emma_counts <- emma_subset_df %>%
+  count(words) %>%
+  arrange(desc(n))
+
+# Select the 20 most common words for plotting
+emma_counts_20 <- emma_counts[1:20,]
+```
+
+### Plotting the data
+A bar plot is created for the 20 most common words in the *emma* data set. 
+
+```{r message=FALSE}
+# Plot the 20 most common words
+emma_counts_20 %>%
+  ggplot(aes(x = reorder(words, n), y = n)) + 
+  geom_col(fill = "darksalmon") + 
+  coord_flip() + 
+  guides(fill = "none") + 
+  geom_text(aes(label=n), hjust = 1.2, colour="white") + 
+  ggtitle("20 Most Common Words in Emma") + 
+  xlab("Words") + 
+  ylab("Word Count")
+```
+
