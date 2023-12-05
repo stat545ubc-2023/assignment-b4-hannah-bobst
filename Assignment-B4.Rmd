@@ -77,3 +77,78 @@ emma_counts_20 %>%
   ylab("Word Count")
 ```
 
+# Exercise 2
+
+### Function
+A function *pig_latin_mod* is created which converts a vector of character data to a modified version of Pig Latin. 
+
+This modified Pig Latin has the following rearrangement rules: 
+
+* For words that end with a vowel, all of the last vowels (until the first consonant) are moved to the beginning of the word. 
+
+* For words that end with a consonant, all of the last consonants (until the last vowel) are moved to the beginning of the word 
+
+In addition, this modified Pig Latin has the following addition rule: 
+
+* Add "ya" to the beginning of each word (after the rearrangement rule has been performed)
+
+For example, the word *about* becomes *yatabou*. 
+This is because *t* has been moved from the end to the beginning, and *ya* has been added to the beginning. 
+```{r message=FALSE}
+#' @title Convert words to modified Pig Latin 
+#'
+#' @description pig_latin_mod takes a vector of character data (one word per observation) and converts each observation to a modified version of Pig Latin. 
+#'
+#' @param data A vector. 
+#' @return A tibble summarizing the maximum values of variable by groups.
+#' 
+#' @import tidyverse
+#' @export
+pig_latin_mod <- function(data){
+  # Check if input data is a vector
+  if(!is.vector(data)){
+    # If data isn't a vector, stop function with an error 
+    stop("Input data must be a vector.")
+  }
+  # Check if the vector has character data 
+  if(!is.character(data)){
+    # If the vector doesn't have character data, stop function with an error
+    stop("Input vector must have character data.")
+  }
+  
+  # Function to detect if a letter is a vowel 
+  is_vowel <- function(x) x %in% c("a", "e", "i", "o", "u", "A", "E", "I", "O", "U")
+  # Function to detect if a letter is a consonant
+  is_consonant <- function(x) !(x %in% c("a", "e", "i", "o", "u", "A", "E", "I", "O", "U"))
+  
+  # Map each letter in function 
+  map_vec(data, function(x){
+    # Split current word by letter
+    data_letters <- str_split(x, "")[[1]]
+    
+    # Find letter at the end of the current word
+    end_letter <- str_sub(x, start=-1)
+    
+    # Find last vowel index for the current word
+    last_vowel <- detect_index(data_letters, is_vowel, .dir="backward")
+    # Find last consonant index for the current word
+    last_con <- detect_index(data_letters, is_consonant, .dir="backward")
+  
+    # If the last letter is a consonant 
+    if(is_consonant(end_letter) == TRUE){
+      # Move letters (until last vowel) from the end to the beginning and add "ya" to the beginning
+      str_c("ya", str_sub(x, start=last_vowel+1), str_sub(x, end=last_vowel))
+    } else{
+      # Move letters (until last consonant) from the end to the beginning and add "ya" to beginning
+      str_c("ya", str_sub(x, start=last_con+1), str_sub(x, end=last_con))
+    }
+  })
+  
+}
+```
+
+
+### Examples
+
+
+### Tests
