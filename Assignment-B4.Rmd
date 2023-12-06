@@ -19,6 +19,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(janeaustenr)
 library(stopwords)
+library(testthat)
 ```
 
 
@@ -114,15 +115,20 @@ By default, both these options are FALSE.
 #' @import tidyverse
 #' @export
 pig_latin_mod <- function(data, remove_punctuation = FALSE, lower_case = FALSE){
-  # Check if input data is a vector
-  if(!is.vector(data)){
+  # Check if input data is an atomic vector
+  if(!is.atomic(data)){
     # If data isn't a vector, stop function with an error 
-    stop("Input data must be a vector.")
+    stop("Input data must be an atomic vector.")
   }
   # Check if the vector has character data 
   if(!is.character(data)){
     # If the vector doesn't have character data, stop function with an error
     stop("Input vector must have character data.")
+  }
+  # Check if the vector has only alphabetical elements
+  if(FALSE %in% str_detect(data, pattern = "[a-z, A-Z]")){
+    # If the vector contains non-alphabetical elements, stop function with an error
+    stop("Input vector must only contain alphabetical elements.")
   }
   # Check if the vector multiple words (blank space between characters) 
   if(TRUE %in% str_detect(data, pattern = " ")){
@@ -237,3 +243,101 @@ pig_latin_mod(sample_words2, lower_case = TRUE)
 
 
 ### Tests
+Seven tests are included. 
+A test is included to ensure that the function works correctly using the first 10 words in the *words* data set. 
+Additionally, a test is added for each of the four error types. 
+Tests are also added for the *remove_punctuation* and *lower_case* parameters. 
+
+#### Test 1
+This test checks if the function produces the correct output using the first 10 words in the *words* data set. 
+The words are converted manually to compare to the function's conversion. 
+
+```{r message=FALSE}
+test_that("Output is correct", {
+  # Check if function output is the same as the manually converted words
+  expect_equal(pig_latin_mod(words[1:10]), c("yaa", "yaeabl", "yatabou", "yaeabsolut", "yaptacce", "yantaccou", "yaeachiev", "yassacro", "yacta", "yaeactiv"))
+})
+```
+
+#### Test 2
+This test checks if the function produces the correct error when entering a data set that is not an atomic vector.
+The correct error message is *Input data must be an atomic vector*.
+
+```{r message=FALSE}
+test_that("Output is vector error",{
+  # Create data set in list format for test
+  data_test2 <- list("the", "and", "therefore", "across", "before")
+  # Check if the function produces the correct error
+  expect_error(pig_latin_mod(data_test2), "Input data must be an atomic vector.")
+})
+```
+
+#### Test 3
+This test checks if the function produces the correct error when entering a data set that does not contain character data.
+The correct error message is *Input vector must have character data*.
+
+```{r message=FALSE}
+test_that("Output is character error", {
+  # Create a numeric data set
+  data_test3 <- c(1:5)
+  # Check if the function produces the correct error
+  expect_error(pig_latin_mod(data_test3), "Input vector must have character data.")
+})
+```
+
+#### Test 4
+This test checks if the function produces the correct error when entering a data set that contains at least one non-alphabetical element. 
+The correct error message is *Input vector must only contain alphabetical elements*.
+
+```{r}
+test_that("Output is alphabetical error", {
+  # Create a data set with some non-alphabetical elements
+  data_test4 <- c("1", "2", "the", "and", "therefore")
+  # Check if the function produces the correct error
+  expect_error(pig_latin_mod(data_test4), "Input vector must only contain alphabetical elements.")
+})
+```
+
+#### Test 5
+This test checks if the function produces the correct error when entering a data set that has multiple words in at least one observation. 
+The correct error message is *Input vector must only have one word per observation*.
+
+```{r message=FALSE}
+test_that("Output is multiple word error", {
+  # Create a data set that contains at least one element with multiple words
+  data_test5 <- c("therefore", "and", "before", "and then", "over there")
+  # Check if the function produces the correct error
+  expect_error(pig_latin_mod(data_test5), "Input vector must only have one word per observation.")
+})
+```
+
+#### Test 6
+This test checks if the *remove_punctuation* parameter works properly. 
+If it is working properly, then the function will remove all punctuation from each word in the data set before converting them to the modified Pig Latin. 
+
+```{r message=FALSE}
+test_that("Output does not contain punctuation", {
+  # Create data set that contains punctuation
+  data_test6 <- c("can't", "then", "when?", "find", "across", "and.")
+  # Create data set with converted words without punctuation (to compare with function output)
+  data_true6 <- c("yantca", "yanthe", "yanwhe", "yandfi", "yassacro", "yanda")
+  # Check if the function produces the correct output
+  expect_equal(pig_latin_mod(data_test6, remove_punctuation = TRUE), data_true6)
+})
+```
+
+#### Test 7
+This test checks if the *lower_case* parameter works properly. 
+If it is working properly, then the function will convert each word in the data set to lower case before converting them to the modified Pig Latin. 
+
+```{r message=FALSE}
+test_that("Output is lowercase", {
+  # Create data set that contains capital letters
+  data_test7 <- c("Therefore", "and", "May", "June", "then", "across")
+  # Create data set with converted words without capital letters (to compare with function output)
+  data_true7 <- c("yaetherefor", "yanda", "yayma", "yaejun", "yanthe", "yassacro")
+  # Check if the function produces the correct output
+  expect_equal(pig_latin_mod(data_test7, lower_case = TRUE), data_true7)
+})
+```
+

@@ -1501,7 +1501,8 @@ border-radius: 0px;
 <pre class="r"><code># Load packages
 library(tidyverse)
 library(janeaustenr)
-library(stopwords)</code></pre>
+library(stopwords)
+library(testthat)</code></pre>
 <div id="exercise-1" class="section level1">
 <h1>Exercise 1</h1>
 <p>This exercise creates a bar graph of the 20 most common words in the
@@ -1604,15 +1605,20 @@ FALSE.</p>
 #&#39; @import tidyverse
 #&#39; @export
 pig_latin_mod &lt;- function(data, remove_punctuation = FALSE, lower_case = FALSE){
-  # Check if input data is a vector
-  if(!is.vector(data)){
+  # Check if input data is an atomic vector
+  if(!is.atomic(data)){
     # If data isn&#39;t a vector, stop function with an error 
-    stop(&quot;Input data must be a vector.&quot;)
+    stop(&quot;Input data must be an atomic vector.&quot;)
   }
   # Check if the vector has character data 
   if(!is.character(data)){
     # If the vector doesn&#39;t have character data, stop function with an error
     stop(&quot;Input vector must have character data.&quot;)
+  }
+  # Check if the vector has only alphabetical elements
+  if(FALSE %in% str_detect(data, pattern = &quot;[a-z, A-Z]&quot;)){
+    # If the vector contains non-alphabetical elements, stop function with an error
+    stop(&quot;Input vector must only contain alphabetical elements.&quot;)
   }
   # Check if the vector multiple words (blank space between characters) 
   if(TRUE %in% str_detect(data, pattern = &quot; &quot;)){
@@ -1731,6 +1737,108 @@ pig_latin_mod(sample_words2, lower_case = TRUE)</code></pre>
 </div>
 <div id="tests" class="section level3">
 <h3>Tests</h3>
+<p>Seven tests are included. A test is included to ensure that the
+function works correctly using the first 10 words in the <em>words</em>
+data set. Additionally, a test is added for each of the four error
+types. Tests are also added for the <em>remove_punctuation</em> and
+<em>lower_case</em> parameters.</p>
+<div id="test-1" class="section level4">
+<h4>Test 1</h4>
+<p>This test checks if the function produces the correct output using
+the first 10 words in the <em>words</em> data set. The words are
+converted manually to compare to the function’s conversion.</p>
+<pre class="r"><code>test_that(&quot;Output is correct&quot;, {
+  # Check if function output is the same as the manually converted words
+  expect_equal(pig_latin_mod(words[1:10]), c(&quot;yaa&quot;, &quot;yaeabl&quot;, &quot;yatabou&quot;, &quot;yaeabsolut&quot;, &quot;yaptacce&quot;, &quot;yantaccou&quot;, &quot;yaeachiev&quot;, &quot;yassacro&quot;, &quot;yacta&quot;, &quot;yaeactiv&quot;))
+})</code></pre>
+<pre><code>## Test passed 🎊</code></pre>
+</div>
+<div id="test-2" class="section level4">
+<h4>Test 2</h4>
+<p>This test checks if the function produces the correct error when
+entering a data set that is not an atomic vector. The correct error
+message is <em>Input data must be an atomic vector</em>.</p>
+<pre class="r"><code>test_that(&quot;Output is vector error&quot;,{
+  # Create data set in list format for test
+  data_test2 &lt;- list(&quot;the&quot;, &quot;and&quot;, &quot;therefore&quot;, &quot;across&quot;, &quot;before&quot;)
+  # Check if the function produces the correct error
+  expect_error(pig_latin_mod(data_test2), &quot;Input data must be an atomic vector.&quot;)
+})</code></pre>
+<pre><code>## Test passed 😸</code></pre>
+</div>
+<div id="test-3" class="section level4">
+<h4>Test 3</h4>
+<p>This test checks if the function produces the correct error when
+entering a data set that does not contain character data. The correct
+error message is <em>Input vector must have character data</em>.</p>
+<pre class="r"><code>test_that(&quot;Output is character error&quot;, {
+  # Create a numeric data set
+  data_test3 &lt;- c(1:5)
+  # Check if the function produces the correct error
+  expect_error(pig_latin_mod(data_test3), &quot;Input vector must have character data.&quot;)
+})</code></pre>
+<pre><code>## Test passed 🌈</code></pre>
+</div>
+<div id="test-4" class="section level4">
+<h4>Test 4</h4>
+<p>This test checks if the function produces the correct error when
+entering a data set that contains at least one non-alphabetical element.
+The correct error message is <em>Input vector must only contain
+alphabetical elements</em>.</p>
+<pre class="r"><code>test_that(&quot;Output is alphabetical error&quot;, {
+  # Create a data set with some non-alphabetical elements
+  data_test4 &lt;- c(&quot;1&quot;, &quot;2&quot;, &quot;the&quot;, &quot;and&quot;, &quot;therefore&quot;)
+  # Check if the function produces the correct error
+  expect_error(pig_latin_mod(data_test4), &quot;Input vector must only contain alphabetical elements.&quot;)
+})</code></pre>
+<pre><code>## Test passed 🌈</code></pre>
+</div>
+<div id="test-5" class="section level4">
+<h4>Test 5</h4>
+<p>This test checks if the function produces the correct error when
+entering a data set that has multiple words in at least one observation.
+The correct error message is <em>Input vector must only have one word
+per observation</em>.</p>
+<pre class="r"><code>test_that(&quot;Output is multiple word error&quot;, {
+  # Create a data set that contains at least one element with multiple words
+  data_test5 &lt;- c(&quot;therefore&quot;, &quot;and&quot;, &quot;before&quot;, &quot;and then&quot;, &quot;over there&quot;)
+  # Check if the function produces the correct error
+  expect_error(pig_latin_mod(data_test5), &quot;Input vector must only have one word per observation.&quot;)
+})</code></pre>
+<pre><code>## Test passed 🎊</code></pre>
+</div>
+<div id="test-6" class="section level4">
+<h4>Test 6</h4>
+<p>This test checks if the <em>remove_punctuation</em> parameter works
+properly. If it is working properly, then the function will remove all
+punctuation from each word in the data set before converting them to the
+modified Pig Latin.</p>
+<pre class="r"><code>test_that(&quot;Output does not contain punctuation&quot;, {
+  # Create data set that contains punctuation
+  data_test6 &lt;- c(&quot;can&#39;t&quot;, &quot;then&quot;, &quot;when?&quot;, &quot;find&quot;, &quot;across&quot;, &quot;and.&quot;)
+  # Create data set with converted words without punctuation (to compare with function output)
+  data_true6 &lt;- c(&quot;yantca&quot;, &quot;yanthe&quot;, &quot;yanwhe&quot;, &quot;yandfi&quot;, &quot;yassacro&quot;, &quot;yanda&quot;)
+  # Check if the function produces the correct output
+  expect_equal(pig_latin_mod(data_test6, remove_punctuation = TRUE), data_true6)
+})</code></pre>
+<pre><code>## Test passed 🌈</code></pre>
+</div>
+<div id="test-7" class="section level4">
+<h4>Test 7</h4>
+<p>This test checks if the <em>lower_case</em> parameter works properly.
+If it is working properly, then the function will convert each word in
+the data set to lower case before converting them to the modified Pig
+Latin.</p>
+<pre class="r"><code>test_that(&quot;Output is lowercase&quot;, {
+  # Create data set that contains capital letters
+  data_test7 &lt;- c(&quot;Therefore&quot;, &quot;and&quot;, &quot;May&quot;, &quot;June&quot;, &quot;then&quot;, &quot;across&quot;)
+  # Create data set with converted words without capital letters (to compare with function output)
+  data_true7 &lt;- c(&quot;yaetherefor&quot;, &quot;yanda&quot;, &quot;yayma&quot;, &quot;yaejun&quot;, &quot;yanthe&quot;, &quot;yassacro&quot;)
+  # Check if the function produces the correct output
+  expect_equal(pig_latin_mod(data_test7, lower_case = TRUE), data_true7)
+})</code></pre>
+<pre><code>## Test passed 🥳</code></pre>
+</div>
 </div>
 </div>
 
