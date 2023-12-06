@@ -6,7 +6,7 @@ output:
   html_document:
     theme: cerulean
     toc: true
-    toc_depth: 3
+    toc_depth: 5
     toc_float: true
 ---
 
@@ -80,7 +80,7 @@ emma_counts_20 %>%
 # Exercise 2
 
 ### Function
-A function *pig_latin_mod* is created which converts a vector of character data to a modified version of Pig Latin. 
+A function *pig_latin_mod* is created which converts a vector of character data (one word per observation) to a modified version of Pig Latin. 
 
 This modified Pig Latin has the following rearrangement rules: 
 
@@ -93,18 +93,27 @@ In addition, this modified Pig Latin has the following addition rule:
 * Add "ya" to the beginning of each word (after the rearrangement rule has been performed)
 
 For example, the word *about* becomes *yatabou*. 
-This is because *t* has been moved from the end to the beginning, and *ya* has been added to the beginning. 
+This is because consonant (up until the last vowel) *t* has been moved from the end to the beginning, and *ya* has been added to the beginning.
+
+Similarly, the word *argue* become *yauearg*.
+This is because the vowels (up until the last consonant) *ue* have been moved from the end to the beginning, and *ya* has been added to the beginning.
+
+The user may specify to remove all punctuation (*remove_punctuation* = TRUE) and to convert all words to lower case (*lower_case* = FALSE). 
+By default, both these options are FALSE. 
+
 ```{r message=FALSE}
 #' @title Convert words to modified Pig Latin 
 #'
-#' @description pig_latin_mod takes a vector of character data (one word per observation) and converts each observation to a modified version of Pig Latin. 
+#' @description pig_latin_mod takes a vector of character data (one word per observation) and converts each observation to a modified version of Pig Latin.
 #'
-#' @param data A vector. 
-#' @return A tibble summarizing the maximum values of variable by groups.
+#' @param data An atomic vector. This vector contains the words to be converted to the modified Pig Latin. 
+#' @param remove_punctuation A Boolean variable. If TRUE, the function removes all punctuation from the data vector. The default is FALSE. 
+#' @param lower_case A Boolean variable. If TRUE, the function converts all words to lower case. The default is FALSE.
+#' @return An atomic vector with the observations from "data" converted to the modified Pig Latin.
 #' 
 #' @import tidyverse
 #' @export
-pig_latin_mod <- function(data){
+pig_latin_mod <- function(data, remove_punctuation = FALSE, lower_case = FALSE){
   # Check if input data is a vector
   if(!is.vector(data)){
     # If data isn't a vector, stop function with an error 
@@ -114,6 +123,21 @@ pig_latin_mod <- function(data){
   if(!is.character(data)){
     # If the vector doesn't have character data, stop function with an error
     stop("Input vector must have character data.")
+  }
+  # Check if the vector multiple words (blank space between characters) 
+  if(TRUE %in% str_detect(data, pattern = " ")){
+    # If multiple words, stop function with an error
+    stop("Input vector must only have one word per observation.")
+  }
+  # Check if remove_punctuation argument is true
+  if(remove_punctuation == TRUE){
+    # Remove punctuation from each word
+    data <- str_remove_all(data, pattern = "[^a-z,A-Z]")
+  }
+  # Check if lower_case argument is true
+  if(lower_case == TRUE){
+    # Convert all words to lower case
+    data <- tolower(data)
   }
   
   # Function to detect if a letter is a vowel 
@@ -149,6 +173,67 @@ pig_latin_mod <- function(data){
 
 
 ### Examples
+This section includes examples using the function *pig_latin_mod*.
+
+#### Example 1
+This example demonstrates the function using the first 20 words in the data set *words*.
+
+```{r message=FALSE}
+# Print original values
+words[1:20]
+
+# Print values converted into the modified Pig Latin 
+pig_latin_mod(words[1:20])
+```
+
+#### Example 2
+This example demonstrates the function using a single observation. 
+The single observation in this case is the 50th word in the data set *words*.
+
+```{r message=FALSE}
+# Print original value 
+words[50]
+
+# Print value converted into the modified Pig Latin 
+pig_latin_mod(words[50])
+```
+
+#### Example 3
+This example demonstrates the *remove_punctuation* parameter. 
+A vector of words which may contain punctuation is made for illustration. 
+
+```{r message=FALSE}
+# Make vector of words
+sample_words1 <- c("the", "able", "therefore", "can't", "found.")
+
+# Print original values
+sample_words1
+
+# Convert values to modified Pig Latin with punctuation
+pig_latin_mod(sample_words1, remove_punctuation = FALSE)
+
+# Convert values to modified Pig Latin without punctuation
+pig_latin_mod(sample_words1, remove_punctuation = TRUE)
+```
+
+
+#### Example 4
+This example demonstrates the *lower_case* parameter. 
+A vector of words which may contain capital letters is made for illustration. 
+
+```{r message=FALSE}
+# Make sample vector of words
+sample_words2 <- c("The", "able", "May", "June", "therefore")
+
+# Print original values
+sample_words2
+
+# Convert values to modified Pig Latin with capital letters
+pig_latin_mod(sample_words2, lower_case = FALSE)
+
+# Convert values to modified Pig Latin with capital letters
+pig_latin_mod(sample_words2, lower_case = TRUE)
+```
 
 
 ### Tests

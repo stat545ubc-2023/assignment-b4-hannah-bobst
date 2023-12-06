@@ -1565,7 +1565,8 @@ emma_counts_20 %&gt;%
 <div id="function" class="section level3">
 <h3>Function</h3>
 <p>A function <em>pig_latin_mod</em> is created which converts a vector
-of character data to a modified version of Pig Latin.</p>
+of character data (one word per observation) to a modified version of
+Pig Latin.</p>
 <p>This modified Pig Latin has the following rearrangement rules:</p>
 <ul>
 <li><p>For words that end with a vowel, all of the last vowels (until
@@ -1580,18 +1581,29 @@ rule:</p>
 has been performed)</li>
 </ul>
 <p>For example, the word <em>about</em> becomes <em>yatabou</em>. This
-is because <em>t</em> has been moved from the end to the beginning, and
-<em>ya</em> has been added to the beginning.</p>
+is because consonant (up until the last vowel) <em>t</em> has been moved
+from the end to the beginning, and <em>ya</em> has been added to the
+beginning.</p>
+<p>Similarly, the word <em>argue</em> become <em>yauearg</em>. This is
+because the vowels (up until the last consonant) <em>ue</em> have been
+moved from the end to the beginning, and <em>ya</em> has been added to
+the beginning.</p>
+<p>The user may specify to remove all punctuation
+(<em>remove_punctuation</em> = TRUE) and to convert all words to lower
+case (<em>lower_case</em> = FALSE). By default, both these options are
+FALSE.</p>
 <pre class="r"><code>#&#39; @title Convert words to modified Pig Latin 
 #&#39;
-#&#39; @description pig_latin_mod takes a vector of character data (one word per observation) and converts each observation to a modified version of Pig Latin. 
+#&#39; @description pig_latin_mod takes a vector of character data (one word per observation) and converts each observation to a modified version of Pig Latin.
 #&#39;
-#&#39; @param data A vector. 
-#&#39; @return A tibble summarizing the maximum values of variable by groups.
+#&#39; @param data An atomic vector. This vector contains the words to be converted to the modified Pig Latin. 
+#&#39; @param remove_punctuation A Boolean variable. If TRUE, the function removes all punctuation from the data vector. The default is FALSE. 
+#&#39; @param lower_case A Boolean variable. If TRUE, the function converts all words to lower case. The default is FALSE.
+#&#39; @return An atomic vector with the observations from &quot;data&quot; converted to the modified Pig Latin.
 #&#39; 
 #&#39; @import tidyverse
 #&#39; @export
-pig_latin_mod &lt;- function(data){
+pig_latin_mod &lt;- function(data, remove_punctuation = FALSE, lower_case = FALSE){
   # Check if input data is a vector
   if(!is.vector(data)){
     # If data isn&#39;t a vector, stop function with an error 
@@ -1601,6 +1613,21 @@ pig_latin_mod &lt;- function(data){
   if(!is.character(data)){
     # If the vector doesn&#39;t have character data, stop function with an error
     stop(&quot;Input vector must have character data.&quot;)
+  }
+  # Check if the vector multiple words (blank space between characters) 
+  if(TRUE %in% str_detect(data, pattern = &quot; &quot;)){
+    # If multiple words, stop function with an error
+    stop(&quot;Input vector must only have one word per observation.&quot;)
+  }
+  # Check if remove_punctuation argument is true
+  if(remove_punctuation == TRUE){
+    # Remove punctuation from each word
+    data &lt;- str_remove_all(data, pattern = &quot;[^a-z,A-Z]&quot;)
+  }
+  # Check if lower_case argument is true
+  if(lower_case == TRUE){
+    # Convert all words to lower case
+    data &lt;- tolower(data)
   }
   
   # Function to detect if a letter is a vowel 
@@ -1635,6 +1662,72 @@ pig_latin_mod &lt;- function(data){
 </div>
 <div id="examples" class="section level3">
 <h3>Examples</h3>
+<p>This section includes examples using the function
+<em>pig_latin_mod</em>.</p>
+<div id="example-1" class="section level4">
+<h4>Example 1</h4>
+<p>This example demonstrates the function using the first 20 words in
+the data set <em>words</em>.</p>
+<pre class="r"><code># Print original values
+words[1:20]</code></pre>
+<pre><code>##  [1] &quot;a&quot;         &quot;able&quot;      &quot;about&quot;     &quot;absolute&quot;  &quot;accept&quot;    &quot;account&quot;  
+##  [7] &quot;achieve&quot;   &quot;across&quot;    &quot;act&quot;       &quot;active&quot;    &quot;actual&quot;    &quot;add&quot;      
+## [13] &quot;address&quot;   &quot;admit&quot;     &quot;advertise&quot; &quot;affect&quot;    &quot;afford&quot;    &quot;after&quot;    
+## [19] &quot;afternoon&quot; &quot;again&quot;</code></pre>
+<pre class="r"><code># Print values converted into the modified Pig Latin 
+pig_latin_mod(words[1:20])</code></pre>
+<pre><code>##  [1] &quot;yaa&quot;         &quot;yaeabl&quot;      &quot;yatabou&quot;     &quot;yaeabsolut&quot;  &quot;yaptacce&quot;   
+##  [6] &quot;yantaccou&quot;   &quot;yaeachiev&quot;   &quot;yassacro&quot;    &quot;yacta&quot;       &quot;yaeactiv&quot;   
+## [11] &quot;yalactua&quot;    &quot;yadda&quot;       &quot;yassaddre&quot;   &quot;yatadmi&quot;     &quot;yaeadvertis&quot;
+## [16] &quot;yactaffe&quot;    &quot;yardaffo&quot;    &quot;yarafte&quot;     &quot;yanafternoo&quot; &quot;yanagai&quot;</code></pre>
+</div>
+<div id="example-2" class="section level4">
+<h4>Example 2</h4>
+<p>This example demonstrates the function using a single observation.
+The single observation in this case is the 50th word in the data set
+<em>words</em>.</p>
+<pre class="r"><code># Print original value 
+words[50]</code></pre>
+<pre><code>## [1] &quot;argue&quot;</code></pre>
+<pre class="r"><code># Print value converted into the modified Pig Latin 
+pig_latin_mod(words[50])</code></pre>
+<pre><code>## [1] &quot;yauearg&quot;</code></pre>
+</div>
+<div id="example-3" class="section level4">
+<h4>Example 3</h4>
+<p>This example demonstrates the <em>remove_punctuation</em> parameter.
+A vector of words which may contain punctuation is made for
+illustration.</p>
+<pre class="r"><code># Make vector of words
+sample_words1 &lt;- c(&quot;the&quot;, &quot;able&quot;, &quot;therefore&quot;, &quot;can&#39;t&quot;, &quot;found.&quot;)
+
+# Print original values
+sample_words1</code></pre>
+<pre><code>## [1] &quot;the&quot;       &quot;able&quot;      &quot;therefore&quot; &quot;can&#39;t&quot;     &quot;found.&quot;</code></pre>
+<pre class="r"><code># Convert values to modified Pig Latin with punctuation
+pig_latin_mod(sample_words1, remove_punctuation = FALSE)</code></pre>
+<pre><code>## [1] &quot;yaeth&quot;       &quot;yaeabl&quot;      &quot;yaetherefor&quot; &quot;yan&#39;tca&quot;     &quot;yand.fou&quot;</code></pre>
+<pre class="r"><code># Convert values to modified Pig Latin without punctuation
+pig_latin_mod(sample_words1, remove_punctuation = TRUE)</code></pre>
+<pre><code>## [1] &quot;yaeth&quot;       &quot;yaeabl&quot;      &quot;yaetherefor&quot; &quot;yantca&quot;      &quot;yandfou&quot;</code></pre>
+</div>
+<div id="example-4" class="section level4">
+<h4>Example 4</h4>
+<p>This example demonstrates the <em>lower_case</em> parameter. A vector
+of words which may contain capital letters is made for illustration.</p>
+<pre class="r"><code># Make sample vector of words
+sample_words2 &lt;- c(&quot;The&quot;, &quot;able&quot;, &quot;May&quot;, &quot;June&quot;, &quot;therefore&quot;)
+
+# Print original values
+sample_words2</code></pre>
+<pre><code>## [1] &quot;The&quot;       &quot;able&quot;      &quot;May&quot;       &quot;June&quot;      &quot;therefore&quot;</code></pre>
+<pre class="r"><code># Convert values to modified Pig Latin with capital letters
+pig_latin_mod(sample_words2, lower_case = FALSE)</code></pre>
+<pre><code>## [1] &quot;yaeTh&quot;       &quot;yaeabl&quot;      &quot;yayMa&quot;       &quot;yaeJun&quot;      &quot;yaetherefor&quot;</code></pre>
+<pre class="r"><code># Convert values to modified Pig Latin with capital letters
+pig_latin_mod(sample_words2, lower_case = TRUE)</code></pre>
+<pre><code>## [1] &quot;yaeth&quot;       &quot;yaeabl&quot;      &quot;yayma&quot;       &quot;yaejun&quot;      &quot;yaetherefor&quot;</code></pre>
+</div>
 </div>
 <div id="tests" class="section level3">
 <h3>Tests</h3>
@@ -1690,7 +1783,7 @@ $(document).ready(function ()  {
 
     // establish options
     var options = {
-      selectors: "h1,h2,h3",
+      selectors: "h1,h2,h3,h4,h5",
       theme: "bootstrap3",
       context: '.toc-content',
       hashGenerator: function (text) {
