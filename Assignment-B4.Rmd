@@ -1,5 +1,5 @@
 ---
-title: "Assignment B4"
+title: "Assignment B4 –  Option A – Strings and Functional Programming in R"
 author: "Hannah Bobst"
 date: "December 7, 2023"
 output: 
@@ -79,19 +79,21 @@ emma_counts_20 %>%
 ```
 
 # Exercise 2
+This exercise creates a function that converts words to a modified version of Pig Latin. 
+Examples are given which show how the function is used, and unit tests are provided to ensure that the function is working as expected.
 
 ### Function
 A function *pig_latin_mod* is created which converts a vector of character data (one word per observation) to a modified version of Pig Latin. 
 
 This modified Pig Latin has the following rearrangement rules: 
 
-* For words that end with a vowel, all of the last vowels (until the first consonant) are moved to the beginning of the word. 
+* For words that end with a vowel, all of the last vowels (until the last consonant) are moved to the beginning of the word. 
 
-* For words that end with a consonant, all of the last consonants (until the last vowel) are moved to the beginning of the word 
+* For words that end with a consonant, all of the last consonants (until the last vowel) are moved to the beginning of the word.
 
 In addition, this modified Pig Latin has the following addition rule: 
 
-* Add "ya" to the beginning of each word (after the rearrangement rule has been performed)
+* Add "ya" to the beginning of each word (after the rearrangement rule has been performed).
 
 For example, the word *about* becomes *yatabou*. 
 This is because consonant (up until the last vowel) *t* has been moved from the end to the beginning, and *ya* has been added to the beginning.
@@ -99,13 +101,13 @@ This is because consonant (up until the last vowel) *t* has been moved from the 
 Similarly, the word *argue* become *yauearg*.
 This is because the vowels (up until the last consonant) *ue* have been moved from the end to the beginning, and *ya* has been added to the beginning.
 
-The user may specify to remove all punctuation (*remove_punctuation* = TRUE) and to convert all words to lower case (*lower_case* = FALSE). 
+The user may specify to remove all punctuation (*remove_punctuation* = TRUE) and to convert all words to lower case (*lower_case* = TRUE). 
 By default, both these options are FALSE. 
 
 ```{r message=FALSE}
 #' @title Convert words to modified Pig Latin 
 #'
-#' @description pig_latin_mod takes a vector of character data (one word per observation) and converts each observation to a modified version of Pig Latin.
+#' @description pig_latin_mod takes a vector of character data (one word per observation) and converts each observation to a modified version of Pig Latin. For words that end with a vowel, all of the last vowels (until the last consonant) are moved to the beginning of the word. For words that end with a consonant, all of the last consonants (until the last vowel) are moved to the beginning of the word. After this rearrangement, "ya" is added to the beginning of the word. If specified, punctuation may be removed and words may be converted to lower case.
 #'
 #' @param data An atomic vector. This vector contains the words to be converted to the modified Pig Latin. 
 #' @param remove_punctuation A Boolean variable. If TRUE, the function removes all punctuation from the data vector. The default is FALSE. 
@@ -314,6 +316,7 @@ test_that("Output is multiple word error", {
 #### Test 6
 This test checks if the *remove_punctuation* parameter works properly. 
 If it is working properly, then the function will remove all punctuation from each word in the data set before converting them to the modified Pig Latin. 
+The words are converted manually to compare to the function's conversion.
 
 ```{r message=FALSE}
 test_that("Output does not contain punctuation", {
@@ -329,6 +332,7 @@ test_that("Output does not contain punctuation", {
 #### Test 7
 This test checks if the *lower_case* parameter works properly. 
 If it is working properly, then the function will convert each word in the data set to lower case before converting them to the modified Pig Latin. 
+The words are converted manually to compare to the function's conversion.
 
 ```{r message=FALSE}
 test_that("Output is lowercase", {

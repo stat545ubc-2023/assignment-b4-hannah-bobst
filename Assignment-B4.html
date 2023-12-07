@@ -13,7 +13,7 @@
 
 <meta name="date" content="2023-12-07" />
 
-<title>Assignment B4</title>
+<title>Assignment B4 – Option A – Strings and Functional Programming in R</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1491,7 +1491,8 @@ border-radius: 0px;
 
 
 
-<h1 class="title toc-ignore">Assignment B4</h1>
+<h1 class="title toc-ignore">Assignment B4 – Option A – Strings and
+Functional Programming in R</h1>
 <h4 class="author">Hannah Bobst</h4>
 <h4 class="date">December 7, 2023</h4>
 
@@ -1563,6 +1564,10 @@ emma_counts_20 %&gt;%
 </div>
 <div id="exercise-2" class="section level1">
 <h1>Exercise 2</h1>
+<p>This exercise creates a function that converts words to a modified
+version of Pig Latin. Examples are given which show how the function is
+used, and unit tests are provided to ensure that the function is working
+as expected.</p>
 <div id="function" class="section level3">
 <h3>Function</h3>
 <p>A function <em>pig_latin_mod</em> is created which converts a vector
@@ -1571,15 +1576,15 @@ Pig Latin.</p>
 <p>This modified Pig Latin has the following rearrangement rules:</p>
 <ul>
 <li><p>For words that end with a vowel, all of the last vowels (until
-the first consonant) are moved to the beginning of the word.</p></li>
+the last consonant) are moved to the beginning of the word.</p></li>
 <li><p>For words that end with a consonant, all of the last consonants
-(until the last vowel) are moved to the beginning of the word</p></li>
+(until the last vowel) are moved to the beginning of the word.</p></li>
 </ul>
 <p>In addition, this modified Pig Latin has the following addition
 rule:</p>
 <ul>
 <li>Add “ya” to the beginning of each word (after the rearrangement rule
-has been performed)</li>
+has been performed).</li>
 </ul>
 <p>For example, the word <em>about</em> becomes <em>yatabou</em>. This
 is because consonant (up until the last vowel) <em>t</em> has been moved
@@ -1591,11 +1596,11 @@ moved from the end to the beginning, and <em>ya</em> has been added to
 the beginning.</p>
 <p>The user may specify to remove all punctuation
 (<em>remove_punctuation</em> = TRUE) and to convert all words to lower
-case (<em>lower_case</em> = FALSE). By default, both these options are
+case (<em>lower_case</em> = TRUE). By default, both these options are
 FALSE.</p>
 <pre class="r"><code>#&#39; @title Convert words to modified Pig Latin 
 #&#39;
-#&#39; @description pig_latin_mod takes a vector of character data (one word per observation) and converts each observation to a modified version of Pig Latin.
+#&#39; @description pig_latin_mod takes a vector of character data (one word per observation) and converts each observation to a modified version of Pig Latin. For words that end with a vowel, all of the last vowels (until the last consonant) are moved to the beginning of the word. For words that end with a consonant, all of the last consonants (until the last vowel) are moved to the beginning of the word. After this rearrangement, &quot;ya&quot; is added to the beginning of the word. If specified, punctuation may be removed and words may be converted to lower case.
 #&#39;
 #&#39; @param data An atomic vector. This vector contains the words to be converted to the modified Pig Latin. 
 #&#39; @param remove_punctuation A Boolean variable. If TRUE, the function removes all punctuation from the data vector. The default is FALSE. 
@@ -1751,7 +1756,7 @@ converted manually to compare to the function’s conversion.</p>
   # Check if function output is the same as the manually converted words
   expect_equal(pig_latin_mod(words[1:10]), c(&quot;yaa&quot;, &quot;yaeabl&quot;, &quot;yatabou&quot;, &quot;yaeabsolut&quot;, &quot;yaptacce&quot;, &quot;yantaccou&quot;, &quot;yaeachiev&quot;, &quot;yassacro&quot;, &quot;yacta&quot;, &quot;yaeactiv&quot;))
 })</code></pre>
-<pre><code>## Test passed 🎊</code></pre>
+<pre><code>## Test passed 🎉</code></pre>
 </div>
 <div id="test-2" class="section level4">
 <h4>Test 2</h4>
@@ -1764,7 +1769,7 @@ message is <em>Input data must be an atomic vector</em>.</p>
   # Check if the function produces the correct error
   expect_error(pig_latin_mod(data_test2), &quot;Input data must be an atomic vector.&quot;)
 })</code></pre>
-<pre><code>## Test passed 😸</code></pre>
+<pre><code>## Test passed 🥇</code></pre>
 </div>
 <div id="test-3" class="section level4">
 <h4>Test 3</h4>
@@ -1791,7 +1796,7 @@ alphabetical elements</em>.</p>
   # Check if the function produces the correct error
   expect_error(pig_latin_mod(data_test4), &quot;Input vector must only contain alphabetical elements.&quot;)
 })</code></pre>
-<pre><code>## Test passed 🌈</code></pre>
+<pre><code>## Test passed 🥳</code></pre>
 </div>
 <div id="test-5" class="section level4">
 <h4>Test 5</h4>
@@ -1805,14 +1810,15 @@ per observation</em>.</p>
   # Check if the function produces the correct error
   expect_error(pig_latin_mod(data_test5), &quot;Input vector must only have one word per observation.&quot;)
 })</code></pre>
-<pre><code>## Test passed 🎊</code></pre>
+<pre><code>## Test passed 😸</code></pre>
 </div>
 <div id="test-6" class="section level4">
 <h4>Test 6</h4>
 <p>This test checks if the <em>remove_punctuation</em> parameter works
 properly. If it is working properly, then the function will remove all
 punctuation from each word in the data set before converting them to the
-modified Pig Latin.</p>
+modified Pig Latin. The words are converted manually to compare to the
+function’s conversion.</p>
 <pre class="r"><code>test_that(&quot;Output does not contain punctuation&quot;, {
   # Create data set that contains punctuation
   data_test6 &lt;- c(&quot;can&#39;t&quot;, &quot;then&quot;, &quot;when?&quot;, &quot;find&quot;, &quot;across&quot;, &quot;and.&quot;)
@@ -1821,14 +1827,15 @@ modified Pig Latin.</p>
   # Check if the function produces the correct output
   expect_equal(pig_latin_mod(data_test6, remove_punctuation = TRUE), data_true6)
 })</code></pre>
-<pre><code>## Test passed 🌈</code></pre>
+<pre><code>## Test passed 😸</code></pre>
 </div>
 <div id="test-7" class="section level4">
 <h4>Test 7</h4>
 <p>This test checks if the <em>lower_case</em> parameter works properly.
 If it is working properly, then the function will convert each word in
 the data set to lower case before converting them to the modified Pig
-Latin.</p>
+Latin. The words are converted manually to compare to the function’s
+conversion.</p>
 <pre class="r"><code>test_that(&quot;Output is lowercase&quot;, {
   # Create data set that contains capital letters
   data_test7 &lt;- c(&quot;Therefore&quot;, &quot;and&quot;, &quot;May&quot;, &quot;June&quot;, &quot;then&quot;, &quot;across&quot;)
@@ -1837,7 +1844,7 @@ Latin.</p>
   # Check if the function produces the correct output
   expect_equal(pig_latin_mod(data_test7, lower_case = TRUE), data_true7)
 })</code></pre>
-<pre><code>## Test passed 🥳</code></pre>
+<pre><code>## Test passed 😀</code></pre>
 </div>
 </div>
 </div>
